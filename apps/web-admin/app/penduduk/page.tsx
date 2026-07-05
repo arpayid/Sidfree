@@ -10,11 +10,13 @@ import {
   X,
   AlertTriangle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function ResidentsPage() {
   const [residents, setResidents] = useState([]);
   const [families, setFamilies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Modals state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -100,12 +102,14 @@ export default function ResidentsPage() {
       if (res.ok) {
         setIsFormModalOpen(false);
         fetchData();
+        toast.success(activeItem ? "Data penduduk berhasil diperbarui" : "Data penduduk berhasil ditambahkan");
       } else {
         const error = await res.json();
-        alert(error.message || "Failed to save data");
+        toast.error(error.message || "Failed to save data");
       }
     } catch (err) {
       console.error("Failed to save", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
 
@@ -120,11 +124,50 @@ export default function ResidentsPage() {
       if (res.ok) {
         setIsDeleteModalOpen(false);
         fetchData();
+        toast.success("Data penduduk berhasil dihapus");
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Failed to delete data");
       }
     } catch (err) {
       console.error("Failed to delete", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
+
+  const exportToCSV = () => {
+    if (residents.length === 0) {
+      toast.error("Tidak ada data untuk diekspor");
+      return;
+    }
+    const headers = ["NIK", "Nama Lengkap", "Nomor KK", "Jenis Kelamin", "Tanggal Lahir", "Alamat", "Pekerjaan"];
+    const csvData = residents.map((r: any) => [
+      r.nik,
+      r.name,
+      r.family?.kkNumber || "-",
+      r.gender,
+      r.birthDate ? new Date(r.birthDate).toLocaleDateString("id-ID") : "-",
+      `"${r.address || "-"}"`,
+      r.occupation || "-"
+    ]);
+    
+    const csvContent = [headers.join(","), ...csvData.map(row => row.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Data_Penduduk_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Data berhasil diekspor");
+  };
+
+  const filteredResidents = residents.filter(
+    (r: any) =>
+      r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.nik.includes(searchQuery)
+  );
 
   return (
     <div className="space-y-6">
@@ -135,13 +178,15 @@ export default function ResidentsPage() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari penduduk..."
+            placeholder="Cari penduduk (NIK atau Nama)..."
           />
         </div>
 
         <div className="flex gap-2">
-          <button className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
             <FileOutput className="w-4 h-4 mr-2" />
             Ekspor
           </button>
@@ -202,17 +247,17 @@ export default function ResidentsPage() {
                     Memuat data...
                   </td>
                 </tr>
-              ) : residents.length === 0 ? (
+              ) : filteredResidents.length === 0 ? (
                 <tr>
                   <td
                     colSpan={5}
                     className="px-6 py-4 text-center text-sm text-slate-500"
                   >
-                    Belum ada data penduduk.
+                    Data tidak ditemukan.
                   </td>
                 </tr>
               ) : (
-                residents.map((resident: any) => (
+                filteredResidents.map((resident: any) => (
                   <tr key={resident.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                       {resident.nik}

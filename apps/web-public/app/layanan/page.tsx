@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FileText, CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function LayananSuratPage() {
   const [formData, setFormData] = useState({
@@ -11,13 +12,11 @@ export default function LayananSuratPage() {
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
 
     try {
       // In a real app we'd first verify NIK to find resident ID
@@ -35,13 +34,14 @@ export default function LayananSuratPage() {
         throw new Error(errorData.message || "Gagal mengirim pengajuan");
       }
       setIsSubmitted(true);
+      toast.success("Pengajuan surat berhasil dikirim");
       setFormData({
         nik: "",
         type: "Surat Keterangan Tidak Mampu (SKTM)",
         keperluan: "",
       });
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan sistem. Silakan coba lagi.");
+      toast.error(err.message || "Terjadi kesalahan sistem. Silakan coba lagi.");
     } finally {
       setIsLoading(false);
     }
@@ -88,12 +88,6 @@ export default function LayananSuratPage() {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">

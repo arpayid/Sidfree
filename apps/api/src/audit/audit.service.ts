@@ -13,7 +13,6 @@ export class AuditService {
     details?: any,
   ) {
     if (!tenantId) return; // Super admin actions might not have tenantId, handle accordingly
-
     await this.prisma.auditLog.create({
       data: {
         tenantId,
@@ -22,6 +21,15 @@ export class AuditService {
         resource,
         details: details ? details : {},
       },
+    });
+  }
+
+  async findAll(tenantId: string) {
+    return this.prisma.auditLog.findMany({
+      where: { tenantId },
+      include: { user: { select: { id: true, name: true, email: true, role: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
     });
   }
 }

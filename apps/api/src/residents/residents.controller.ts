@@ -104,4 +104,18 @@ export class ResidentsController {
     );
     return resident;
   }
+
+  @Delete(":id")
+  @RequirePermissions("write:resident")
+  async remove(@Param("id") id: string, @CurrentUser() user: any) {
+    const resident = await this.residentsService.remove(id, user.tenantId);
+    await this.auditService.log(
+      user.tenantId,
+      user.userId,
+      "DELETE",
+      "Resident",
+      { residentId: id },
+    );
+    return resident;
+  }
 }

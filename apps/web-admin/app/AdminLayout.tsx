@@ -12,6 +12,8 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
+
 export default function AdminLayout({
   children,
 }: {
@@ -123,6 +125,7 @@ export default function AdminLayout({
         </header>
         <main className="flex-1 p-8">{children}</main>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Param,
   Body,
   UseGuards,
@@ -32,7 +33,6 @@ export class FamiliesController {
       "READ_LIST",
       "Family",
     );
-
     return families.map((f) => ({
       ...f,
       kkNumber:
@@ -66,6 +66,34 @@ export class FamiliesController {
       "CREATE",
       "Family",
       { familyId: family.id },
+    );
+    return family;
+  }
+
+  @Put(":id")
+  @RequirePermissions("write:resident")
+  async update(@Param("id") id: string, @Body() body: any, @CurrentUser() user: any) {
+    const family = await this.familiesService.update(id, body, user.tenantId);
+    await this.auditService.log(
+      user.tenantId,
+      user.userId,
+      "UPDATE",
+      "Family",
+      { familyId: family.id, updates: body },
+    );
+    return family;
+  }
+
+  @Delete(":id")
+  @RequirePermissions("write:resident")
+  async remove(@Param("id") id: string, @CurrentUser() user: any) {
+    const family = await this.familiesService.remove(id, user.tenantId);
+    await this.auditService.log(
+      user.tenantId,
+      user.userId,
+      "DELETE",
+      "Family",
+      { familyId: id },
     );
     return family;
   }

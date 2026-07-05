@@ -37,4 +37,11 @@ export class ComplaintsService {
       data,
     });
   }
+
+  async remove(id: string, tenantId: string) {
+    await this.findOne(id, tenantId);
+    return this.prisma.complaint.delete({
+      where: { id },
+    });
+  }
 }

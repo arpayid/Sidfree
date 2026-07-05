@@ -69,6 +69,32 @@ export default function Home() {
           </a>
         </div>
       </div>
+      
+      {/* Statistics Section */}
+      <div className="mt-24 border-t border-slate-200 pt-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-slate-900">Desa Sukamaju dalam Angka</h2>
+          <p className="mt-4 text-lg text-slate-500">Transparansi data kependudukan dan pelayanan publik desa.</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="text-center">
+            <div className="text-4xl font-extrabold text-blue-600">3.245</div>
+            <div className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-wide">Penduduk</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-extrabold text-blue-600">912</div>
+            <div className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-wide">Kepala Keluarga</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-extrabold text-green-600">1.450</div>
+            <div className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-wide">Surat Selesai</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl font-extrabold text-red-600">98%</div>
+            <div className="mt-2 text-sm font-medium text-slate-500 uppercase tracking-wide">Aduan Tertangani</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

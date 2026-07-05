@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Search, FileText, Check, X, FileOutput, Printer } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function SuratPage() {
   const [letters, setLetters] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchLetters = async () => {
     setIsLoading(true);
@@ -40,11 +42,48 @@ export default function SuratPage() {
       });
       if (res.ok) {
         fetchLetters();
+        toast.success("Status surat berhasil diperbarui");
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Gagal memperbarui status");
       }
     } catch (err) {
       console.error("Failed to update status", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
+
+  const exportToCSV = () => {
+    if (letters.length === 0) {
+      toast.error("Tidak ada data untuk diekspor");
+      return;
+    }
+    const headers = ["ID", "Tipe Surat", "Nama Pemohon", "NIK", "Tanggal Pengajuan", "Status"];
+    const csvData = letters.map((l: any) => [
+      l.id,
+      `"${l.type}"`,
+      `"${l.resident?.name || "-"}"`,
+      `"${l.resident?.nik || "-"}"`,
+      new Date(l.createdAt).toLocaleDateString("id-ID"),
+      l.status
+    ]);
+    
+    const csvContent = [headers.join(","), ...csvData.map(row => row.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Data_Pengajuan_Surat_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Data surat berhasil diekspor");
+  };
+
+  const filteredLetters = letters.filter((l: any) => 
+    l.type.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (l.resident && l.resident.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="space-y-6">
@@ -55,13 +94,15 @@ export default function SuratPage() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
             placeholder="Cari pengajuan surat..."
           />
         </div>
 
         <div className="flex gap-2">
-          <button className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
+          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
             <FileOutput className="w-4 h-4 mr-2" />
             Rekap Data
           </button>
@@ -115,7 +156,7 @@ export default function SuratPage() {
                     Memuat data...
                   </td>
                 </tr>
-              ) : letters.length === 0 ? (
+              ) : filteredLetters.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
@@ -123,16 +164,13 @@ export default function SuratPage() {
                         <FileText className="w-6 h-6 text-slate-400" />
                       </div>
                       <p className="text-sm font-medium text-slate-900">
-                        Belum Ada Pengajuan Surat
-                      </p>
-                      <p className="text-sm text-slate-500">
-                        Pengajuan surat baru dari warga akan muncul di sini.
+                        Data Tidak Ditemukan
                       </p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                letters.map((letter: any) => (
+                filteredLetters.map((letter: any) => (
                   <tr key={letter.id} className="hover:bg-slate-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                       {letter.type}

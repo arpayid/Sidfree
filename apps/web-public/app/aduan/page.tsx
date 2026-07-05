@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MessageSquare, CheckCircle } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function AduanPage() {
   const [formData, setFormData] = useState({
@@ -24,12 +25,15 @@ export default function AduanPage() {
         body: JSON.stringify(formData),
       });
       if (!res.ok) {
-        throw new Error("Gagal mengirim laporan");
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.message || "Gagal mengirim laporan");
       }
       setIsSubmitted(true);
+      toast.success("Aduan berhasil dikirim");
       setFormData({ title: "", content: "", nik: "" });
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err.message || "Terjadi kesalahan sistem");
     } finally {
       setIsLoading(false);
     }

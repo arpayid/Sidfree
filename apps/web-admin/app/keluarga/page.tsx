@@ -1,19 +1,12 @@
 "use client";
-
 import { useEffect, useState } from "react";
-import {
-  Plus,
-  Search,
-  Edit2,
-  Trash2,
-  X,
-  AlertTriangle,
-  Users,
-} from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Users, X, AlertTriangle } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function KeluargaPage() {
   const [families, setFamilies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Modals state
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
@@ -32,8 +25,9 @@ export default function KeluargaPage() {
     setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const headers = { Authorization: `Bearer ${token}` };
-      const res = await fetch("/api/families", { headers });
+      const res = await fetch("/api/families", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       if (res.ok) {
         setFamilies(await res.json());
       }
@@ -48,12 +42,12 @@ export default function KeluargaPage() {
     fetchData();
   }, []);
 
-  const handleOpenForm = (family: any = null) => {
+  const handleOpenForm = (family = null) => {
     if (family) {
       setActiveItem(family);
       setFormData({
-        kkNumber: family.kkNumber || "",
-        address: family.address || "",
+        kkNumber: family.kkNumber,
+        address: family.address,
         rt: family.rt || "",
         rw: family.rw || "",
       });
@@ -74,15 +68,13 @@ export default function KeluargaPage() {
     try {
       const token = localStorage.getItem("token");
       const method = activeItem ? "PUT" : "POST";
-      const url = activeItem
-        ? `/api/families/${activeItem.id}`
-        : "/api/families";
+      const url = activeItem ? `/api/families/${activeItem.id}` : "/api/families";
 
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(formData),
       });
@@ -90,31 +82,43 @@ export default function KeluargaPage() {
       if (res.ok) {
         setIsFormModalOpen(false);
         fetchData();
+        toast.success(activeItem ? "Data keluarga berhasil diperbarui" : "Data keluarga berhasil ditambahkan");
       } else {
-        alert("Gagal menyimpan data keluarga");
+        const errData = await res.json();
+        toast.error(errData.message || "Gagal menyimpan data keluarga");
       }
     } catch (err) {
       console.error("Failed to save family", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
 
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      // Actually we don't have a DELETE endpoint in the API right now,
-      // but let's assume it or at least close the modal for now.
-      // A full implementation would call DELETE /api/families/:id
       const res = await fetch(`/api/families/${activeItem.id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       });
-
-      setIsDeleteModalOpen(false);
-      fetchData();
+      if (res.ok) {
+        setIsDeleteModalOpen(false);
+        fetchData();
+        toast.success("Data keluarga berhasil dihapus");
+      } else {
+        const errData = await res.json();
+        toast.error(errData.message || "Gagal menghapus data");
+      }
     } catch (err) {
       console.error("Failed to delete family", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
+
+  const filteredFamilies = families.filter(
+    (f: any) =>
+      f.kkNumber.includes(searchQuery) ||
+      (f.address && f.address.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="space-y-6">
@@ -125,19 +129,19 @@ export default function KeluargaPage() {
           </div>
           <input
             type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari Nomor KK..."
+            placeholder="Cari nomor KK atau alamat..."
           />
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => handleOpenForm()}
-            className="flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Data KK
-          </button>
-        </div>
+        <button 
+          onClick={() => handleOpenForm()}
+          className="flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Tambah Data
+        </button>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
@@ -145,91 +149,43 @@ export default function KeluargaPage() {
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  Nomor KK
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  Kepala Keluarga / Anggota
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  Alamat
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  RT / RW
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  Aksi
-                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">No. KK</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Anggota</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Alamat</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">RT / RW</th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
               {isLoading ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-sm text-slate-500"
-                  >
-                    Memuat data...
-                  </td>
+                  <td colSpan={5} className="px-6 py-4 text-center text-sm text-slate-500">Memuat data...</td>
                 </tr>
-              ) : families.length === 0 ? (
+              ) : filteredFamilies.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center">
                       <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3">
                         <Users className="w-6 h-6 text-slate-400" />
                       </div>
-                      <p className="text-sm font-medium text-slate-900">
-                        Belum Ada Data Keluarga
-                      </p>
+                      <p className="text-sm font-medium text-slate-900">Data Tidak Ditemukan</p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                families.map((family: any) => (
+                filteredFamilies.map((family: any) => (
                   <tr key={family.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
-                      {family.kkNumber}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">{family.kkNumber}</td>
                     <td className="px-6 py-4 text-sm text-slate-500">
-                      {family.residents && family.residents.length > 0
-                        ? `${family.residents.length} Anggota`
-                        : "-"}
+                      {family.residents && family.residents.length > 0 ? `${family.residents.length} Anggota` : '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                      {family.address}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                      {family.rt} / {family.rw}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{family.address}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{family.rt} / {family.rw}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleOpenForm(family)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
-                        title="Edit"
-                      >
+                      <button onClick={() => handleOpenForm(family)} className="text-blue-600 hover:text-blue-900 mr-4" title="Edit">
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleOpenDelete(family)}
-                        className="text-red-600 hover:text-red-900"
-                        title="Hapus"
-                      >
+                      <button onClick={() => handleOpenDelete(family)} className="text-red-600 hover:text-red-900" title="Hapus">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
@@ -246,74 +202,54 @@ export default function KeluargaPage() {
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-lg">
             <div className="flex justify-between items-center p-6 border-b border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900">
-                {activeItem
-                  ? "Edit Data Keluarga (KK)"
-                  : "Tambah Data Keluarga (KK)"}
-              </h3>
-              <button
-                onClick={() => setIsFormModalOpen(false)}
-                className="text-slate-400 hover:text-slate-500"
-              >
+              <h3 className="text-lg font-semibold text-slate-900">{activeItem ? 'Edit Data Keluarga (KK)' : 'Tambah Data Keluarga (KK)'}</h3>
+              <button onClick={() => setIsFormModalOpen(false)} className="text-slate-400 hover:text-slate-500">
                 <X className="w-5 h-5" />
               </button>
             </div>
+            
             <form onSubmit={handleSubmitForm} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Nomor KK
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Nomor KK</label>
                 <input
                   required
                   type="text"
                   value={formData.kkNumber}
-                  onChange={(e) =>
-                    setFormData({ ...formData, kkNumber: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, kkNumber: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="16 Digit Nomor KK"
                 />
               </div>
+              
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  Alamat
-                </label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Alamat</label>
                 <input
                   required
                   type="text"
                   value={formData.address}
-                  onChange={(e) =>
-                    setFormData({ ...formData, address: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                   placeholder="Alamat Domisili"
                 />
               </div>
+              
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    RT
-                  </label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">RT</label>
                   <input
                     type="text"
                     value={formData.rt}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rt: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, rt: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     placeholder="001"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
-                    RW
-                  </label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">RW</label>
                   <input
                     type="text"
                     value={formData.rw}
-                    onChange={(e) =>
-                      setFormData({ ...formData, rw: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, rw: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                     placeholder="002"
                   />
@@ -332,7 +268,7 @@ export default function KeluargaPage() {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700"
                 >
-                  {activeItem ? "Simpan Perubahan" : "Simpan"}
+                  {activeItem ? 'Simpan Perubahan' : 'Simpan'}
                 </button>
               </div>
             </form>
@@ -347,13 +283,9 @@ export default function KeluargaPage() {
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-8 h-8 text-red-600" />
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">
-              Hapus Data KK
-            </h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Hapus Data KK</h3>
             <p className="text-slate-500 mb-6">
-              Apakah Anda yakin ingin menghapus data KK{" "}
-              <strong>{activeItem?.kkNumber}</strong>? Tindakan ini tidak dapat
-              dibatalkan.
+              Apakah Anda yakin ingin menghapus data KK <strong>{activeItem?.kkNumber}</strong>? Tindakan ini tidak dapat dibatalkan.
             </p>
             <div className="flex justify-center gap-3">
               <button

@@ -37,4 +37,11 @@ export class FamiliesService {
       data,
     });
   }
+
+  async remove(id: string, tenantId: string) {
+    await this.findOne(id, tenantId);
+    return this.prisma.family.delete({
+      where: { id },
+    });
+  }
 }
