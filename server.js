@@ -32,6 +32,55 @@ function startApp(workspace, port, script) {
 const script = isDev ? 'dev' : 'start';
 startApp('apps/web-public', WEB_PUBLIC_PORT, script);
 startApp('apps/web-admin', WEB_ADMIN_PORT, script);
+const { execSync } = require('child_process');
+
+if (process.env.SQL_HOST && process.env.SQL_USER && process.env.SQL_PASSWORD && process.env.SQL_DB_NAME) {
+  // Construct Prisma DATABASE_URL from Cloud SQL credentials for runtime
+  const user = encodeURIComponent(process.env.SQL_USER);
+  const password = encodeURIComponent(process.env.SQL_PASSWORD);
+  const dbName = process.env.SQL_DB_NAME;
+  const host = process.env.SQL_HOST;
+  
+  if (host.startsWith('/')) {
+    process.env.DATABASE_URL = `postgresql://${user}:${password}@localhost/${dbName}?host=${encodeURIComponent(host)}`;
+  } else {
+    process.env.DATABASE_URL = `postgresql://${user}:${password}@${host}/${dbName}`;
+  }
+}
+
+// For Prisma DB push and seed, we need admin privileges
+if (process.env.SQL_HOST && process.env.SQL_ADMIN_USER && process.env.SQL_ADMIN_PASSWORD && process.env.SQL_DB_NAME) {
+  const adminUser = encodeURIComponent(process.env.SQL_ADMIN_USER);
+  const adminPassword = encodeURIComponent(process.env.SQL_ADMIN_PASSWORD);
+  const dbName = process.env.SQL_DB_NAME;
+  const host = process.env.SQL_HOST;
+  
+  let adminUrl = '';
+  if (host.startsWith('/')) {
+    adminUrl = `postgresql://${adminUser}:${adminPassword}@localhost/${dbName}?host=${encodeURIComponent(host)}`;
+  } else {
+    adminUrl = `postgresql://${adminUser}:${adminPassword}@${host}/${dbName}`;
+  }
+  
+  console.log('Running prisma db push with admin user');
+  try {
+    execSync('npx prisma db push', { cwd: 'packages/database', stdio: 'inherit', env: { ...process.env, DATABASE_URL: adminUrl } });
+    execSync('npx prisma generate', { cwd: 'packages/database', stdio: 'inherit', env: { ...process.env, DATABASE_URL: adminUrl } });
+    try { execSync('npm run seed', { cwd: 'packages/database', stdio: 'inherit', env: { ...process.env, DATABASE_URL: adminUrl } }); } catch(e) {}
+  } catch (e) {
+    console.error('Prisma push failed:', e);
+  }
+} else if (process.env.DATABASE_URL) {
+  // Fallback for local sqlite or direct DATABASE_URL usage
+  console.log('Running prisma db push with generic url');
+  try {
+    execSync('npx prisma db push', { cwd: 'packages/database', stdio: 'inherit', env: process.env });
+    execSync('npx prisma generate', { cwd: 'packages/database', stdio: 'inherit', env: process.env });
+    try { execSync('npm run seed', { cwd: 'packages/database', stdio: 'inherit', env: process.env }); } catch(e) {}
+  } catch (e) {
+    console.error('Prisma push failed:', e);
+  }
+}
 startApp('apps/api', API_PORT, script);
 
 const apiProxy = createProxyMiddleware({ target: `http://127.0.0.1:${API_PORT}`, changeOrigin: true });

@@ -22,6 +22,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     // Check auth on mount
@@ -29,6 +30,11 @@ export default function AdminLayout({
     if (!token && pathname !== "/login") {
       router.push("/login");
     } else if (token) {
+      try {
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        setUserRole(user.role);
+      } catch (e) {}
+
       setIsAuthenticated(true);
     }
     setIsLoading(false);

@@ -8,6 +8,8 @@ import { ResidentsModule } from "./residents/residents.module";
 import { FamiliesModule } from "./families/families.module";
 import { LettersModule } from "./letters/letters.module";
 import { ComplaintsModule } from "./complaints/complaints.module";
+import { DashboardModule } from "./dashboard/dashboard.module";
+import { TenantModule } from "./tenant/tenant.module";
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ComplaintsModule } from "./complaints/complaints.module";
     FamiliesModule,
     LettersModule,
     ComplaintsModule,
+    DashboardModule,
+    TenantModule,
   ],
   controllers: [AppController, PublicController],
   providers: [],

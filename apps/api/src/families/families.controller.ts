@@ -39,6 +39,10 @@ export class FamiliesController {
         f.kkNumber && f.kkNumber.length >= 8
           ? f.kkNumber.replace(/(.{4}).*(.{4})/, "$1********$2")
           : f.kkNumber,
+      residents: f.residents?.map(r => ({
+        ...r,
+        nik: r.nik && r.nik.length >= 8 ? r.nik.replace(/(.{4}).*(.{4})/, "$1********$2") : r.nik
+      })) || []
     }));
   }
 
