@@ -11,7 +11,10 @@
     "build": "npm run build --workspaces --if-present",
     "start": "node server.js",
     "lint": "echo 'Linting passed' # Skipping native eslint due to monorepo config conflicts",
-    "postinstall": "npm run generate --workspaces --if-present"
+    "postinstall": "npm run generate --workspaces --if-present",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
@@ -19,11 +22,15 @@
     "http-proxy-middleware": "^3.0.0"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.27",
     "@tailwindcss/postcss": "4.1.11",
+    "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jest": "^30.4.2",
     "tailwindcss": "4.1.11",
+    "ts-jest": "^29.4.11",
     "typescript": "5.9.3"
   }
 }
