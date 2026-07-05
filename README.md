@@ -1,20 +1,59 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# 🏛️ SIDPRO - Sistem Informasi Desa
+Aplikasi multi-tenant full-stack untuk administrasi dan layanan publik pemerintahan desa.
 
-# Run and deploy your AI Studio app
+![Versi](https://img.shields.io/badge/version-1.0.0-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-18+-brightgreen)
 
-This contains everything you need to run your app locally.
+## ✨ Fitur Utama
+- **📝 Manajemen Surat** - Pengajuan surat SKTM, domisili, pengantar online
+- **🤖 AI-Powered** - Gemini API untuk template generation & sentiment analysis
+- **👥 Database Warga** - Kelola penduduk, keluarga, dan dokumen
+- **📊 Dashboard Admin** - Analytics dashboard untuk admin desa
+- **📢 Sistem Aduan** - Warga dapat menyampaikan keluhan terstruktur
+- **🏢 Multi-Tenant** - Isolated data per desa dengan role-based access
+- **☁️ Cloud Native** - Siap deploy ke Google Cloud Run
 
-View your app in AI Studio: https://ai.studio/apps/e753bca5-4cce-4c90-9fbe-03b2c9171c6a
+## 🛠️ Tech Stack
+### Backend
+- **Runtime**: Node.js 18+
+- **Framework**: NestJS 11
+- **Database**: PostgreSQL 13+ (Prisma ORM)
+- **API**: REST + OpenAPI/Swagger
+- **AI**: Google Gemini 2.5 Flash API
 
-## Run Locally
+### Frontend
+- **Web Public**: Next.js 14 + React 18 + Tailwind CSS
+- **Web Admin**: Next.js 14 + React 18 + Tailwind CSS
+- **UI Components**: Lucide Icons + Custom components
 
-**Prerequisites:**  Node.js
+### Deployment
+- **Cloud**: Google Cloud Run
+- **Container**: Docker
+- **Database**: Cloud SQL (PostgreSQL)
 
+## 🚀 Quick Start
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 13+ atau Cloud SQL
+- Gemini API Key
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+### Local Development
+\`\`\`bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment variables in .env
+
+# 3. Run migration script (opsional untuk setup lengkap)
+./scripts/migrate-to-monorepo.sh
+
+# 4. Start development server
+npm run dev
+\`\`\`
+
+## 📚 API Documentation
+API docs tersedia di `/api/docs` saat menjalankan aplikasi lokal.
+
+---
+**Made with ❤️ for Indonesian Villages**

@@ -1,0 +1,20 @@
+runtime: nodejs18
+env: flex
+entrypoint: node server.js
+
+env_variables:
+  NODE_ENV: "production"
+  PORT: "8080"
+  LOG_LEVEL: "info"
+
+automatic_scaling:
+  min_instances: 1
+  max_instances: 5
+  cool_down_period_sec: 60
+  cpu_utilization:
+    target_utilization: 0.6
+
+resources:
+  cpu: 2
+  memory_gb: 2
+  disk_size_gb: 10
