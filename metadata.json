@@ -1,0 +1,6 @@
+{
+  "name": "SIDPRO",
+  "description": "Sistem Informasi Desa - Aplikasi multi-tenant untuk administrasi pemerintahan desa.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

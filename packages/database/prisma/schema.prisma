@@ -1,0 +1,135 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users      User[]
+  residents  Resident[]
+  families   Family[]
+  complaints Complaint[]
+  letters    Letter[]
+  auditLogs  AuditLog[]
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   // Super Admin, Admin Desa, Warga
+  permissions String // e.g., ["read:resident", "write:resident"]
+  
+  users       User[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  
+  tenantId  String?
+  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
+  
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  auditLogs AuditLog[]
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  kkNumber  String // Kartu Keluarga Number
+  address   String
+  rt        String?
+  rw        String?
+  
+  residents Resident[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Resident {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  nik       String   // NIK
+  name      String
+  birthDate DateTime?
+  birthPlace String?
+  gender    String?
+  religion  String?
+  
+  familyId  String?
+  family    Family?  @relation(fields: [familyId], references: [id])
+
+  status    String   @default("Aktif") // Aktif, Pindah, Meninggal
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  complaints Complaint[]
+  letters    Letter[]
+}
+
+model Complaint {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  title     String
+  content   String
+  status    String   @default("Pending") // Pending, Processed, Resolved
+  
+  residentId String?
+  resident   Resident? @relation(fields: [residentId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Letter {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  type      String   // SKTM, Domisili, Pengantar
+  status    String   @default("Pending") // Pending, Approved, Rejected, Printed
+  
+  residentId String
+  resident   Resident @relation(fields: [residentId], references: [id])
+  
+  metadata  Json?    // Specific data for the letter type
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  action    String
+  resource  String
+  details   Json?
+  
+  createdAt DateTime @default(now())
+}
