@@ -12,8 +12,10 @@ import { LettersModule } from "./letters/letters.module";
 import { ComplaintsModule } from "./complaints/complaints.module";
 import { DashboardModule } from "./dashboard/dashboard.module";
 import { TenantModule } from "./tenant/tenant.module";
+import { AdminModule } from "./admin/admin.module";
 
 import { AiService } from "./ai/ai.service";
+import { WhatsappModule } from "./whatsapp/whatsapp.module";
 
 import { HealthController } from "./health.controller";
 
@@ -32,6 +34,8 @@ import { HealthController } from "./health.controller";
     ComplaintsModule,
     DashboardModule,
     TenantModule,
+    AdminModule,
+    WhatsappModule,
   ],
   controllers: [AppController, PublicController, HealthController],
   providers: [

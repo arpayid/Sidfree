@@ -46,6 +46,24 @@ export default function RootLayout({
                   >
                     Aduan Warga
                   </a>
+                  <a
+                    href="/pembayaran"
+                    className="text-slate-500 hover:text-slate-700 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium"
+                  >
+                    Pembayaran
+                  </a>
+                  <a
+                    href="/potensi"
+                    className="text-slate-500 hover:text-slate-700 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium"
+                  >
+                    UMKM & Potensi
+                  </a>
+                  <a
+                    href="/kiosk"
+                    className="text-slate-500 hover:text-slate-700 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium"
+                  >
+                    Anjungan (Kiosk)
+                  </a>
                 </nav>
                 <div className="flex items-center">
                   <a

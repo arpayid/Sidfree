@@ -18,7 +18,6 @@ export class DashboardController {
       this.prisma.complaint.count({ where: { tenantId, status: 'Pending' } }),
     ]);
 
-    // Simple mock for chart data - in reality we would group by month
     const chartData = [
       { name: "Jan", surat: 10, aduan: 2 },
       { name: "Feb", surat: 15, aduan: 5 },
@@ -34,6 +33,30 @@ export class DashboardController {
       totalLetters,
       pendingComplaints,
       chartData
+    };
+  }
+
+  @Get('analytics/demographics')
+  async getDemographics(@Request() req: any) {
+    const tenantId = req.user.tenantId;
+    
+    // Group residents by gender
+    const byGender = await this.prisma.resident.groupBy({
+      by: ['gender'],
+      _count: true,
+      where: { tenantId }
+    });
+    
+    // Group residents by status
+    const byStatus = await this.prisma.resident.groupBy({
+      by: ['status'],
+      _count: true,
+      where: { tenantId }
+    });
+
+    return {
+      gender: byGender.map(g => ({ name: g.gender || 'Tidak Diketahui', value: g._count })),
+      status: byStatus.map(s => ({ name: s.status, value: s._count })),
     };
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Search, FileText, Check, X, FileOutput, Printer } from "lucide-react";
+import { Search, FileText, Check, X, FileOutput, Printer, PenTool } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function SuratPage() {
@@ -66,8 +66,15 @@ export default function SuratPage() {
               <p>Kepala Desa,</p>
               <div class="footer-signature">
                 <p><strong>Bpk. Ahmad Subarjo</strong></p>
+                ${letter.signature ? `<p style="font-size:12px;color:#666">Telah ditandatangani secara elektronik (TTE)<br/>ID: ${letter.signature}</p>` : ''}
               </div>
             </div>
+            ${letter.qrCode ? `
+            <div style="margin-top:40px;text-align:center;font-size:14px;color:#444">
+              <p>Scan atau kunjungi URL berikut untuk memverifikasi keaslian surat:</p>
+              <p><strong>https://sidpro.desa.id/verify/${letter.qrCode}</strong></p>
+            </div>
+            ` : ''}
             <script>
               window.onload = function() { window.print(); }
             </script>
@@ -80,6 +87,29 @@ export default function SuratPage() {
       if (letter.status !== "Printed") {
         handleUpdateStatus(letter.id, "Printed");
       }
+    }
+  };
+
+  const handleSignLetter = async (id: string) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/admin/letters/${id}/sign`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        fetchLetters();
+        toast.success("Surat berhasil ditandatangani secara digital (TTE)");
+      } else {
+        const error = await res.json();
+        toast.error(error.message || "Gagal TTE");
+      }
+    } catch (err) {
+      console.error("Failed to sign", err);
+      toast.error("Terjadi kesalahan sistem");
     }
   };
 
@@ -251,13 +281,11 @@ export default function SuratPage() {
                       {letter.status === "Pending" && (
                         <>
                           <button
-                            onClick={() =>
-                              handleUpdateStatus(letter.id, "Approved")
-                            }
+                            onClick={() => handleSignLetter(letter.id)}
                             className="text-green-600 hover:text-green-900 mr-4"
                             title="Setujui"
                           >
-                            <Check className="w-5 h-5" />
+                            <PenTool className="w-5 h-5" />
                           </button>
                           <button
                             onClick={() =>

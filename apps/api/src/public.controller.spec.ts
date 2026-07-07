@@ -2,12 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PublicController } from './public.controller';
 import { PrismaService } from './prisma/prisma.service';
 import { AiService } from './ai/ai.service';
+import { WhatsappService } from './whatsapp/whatsapp.service';
 import { SubmitComplaintDto } from './dto/public.dto';
 
 describe('PublicController', () => {
   let controller: PublicController;
   let prismaService: PrismaService;
   let aiService: AiService;
+  let whatsappService: WhatsappService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,6 +21,7 @@ describe('PublicController', () => {
             tenant: { findFirst: jest.fn() },
             complaint: { create: jest.fn() },
             resident: { findFirst: jest.fn() },
+            letter: { create: jest.fn() },
           },
         },
         {
@@ -31,12 +34,19 @@ describe('PublicController', () => {
             }),
           },
         },
+        {
+          provide: WhatsappService,
+          useValue: {
+            sendMessage: jest.fn().mockResolvedValue(true),
+          },
+        },
       ],
     }).compile();
 
     controller = module.get<PublicController>(PublicController);
     prismaService = module.get<PrismaService>(PrismaService);
     aiService = module.get<AiService>(AiService);
+    whatsappService = module.get<WhatsappService>(WhatsappService);
   });
 
   describe('submitComplaint', () => {
