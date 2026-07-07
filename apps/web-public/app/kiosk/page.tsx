@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 
 export default function KioskPage() {
   const [nik, setNik] = useState("");
@@ -17,7 +18,7 @@ export default function KioskPage() {
 
   const handleLogin = async () => {
     if (nik.length !== 16) {
-      alert("NIK harus 16 digit");
+      toast.error("NIK harus 16 digit");
       return;
     }
     setLoading(true);
@@ -28,10 +29,10 @@ export default function KioskPage() {
         setResident(data.resident);
         setStep(2);
       } else {
-        alert("NIK tidak terdaftar");
+        toast.error("NIK tidak terdaftar");
       }
     } catch (e) {
-      alert("Terjadi kesalahan jaringan");
+      toast.error("Terjadi kesalahan jaringan");
     }
     setLoading(false);
   };
@@ -45,21 +46,26 @@ export default function KioskPage() {
         body: JSON.stringify({ nik, type, keperluan: "Kiosk Self-Service" })
       });
       if (res.ok) {
-        alert(`Pengajuan ${type} berhasil! Silakan ambil cetakan atau tunggu validasi TTE dari Kepala Desa.`);
+        toast.success(`Pengajuan ${type} berhasil! Silakan ambil cetakan atau tunggu validasi TTE dari Kepala Desa.`, { duration: 5000 });
         setStep(1);
         setNik("");
         setResident(null);
       } else {
-        alert("Gagal mengajukan surat.");
+        toast.error("Gagal mengajukan surat.");
       }
     } catch (e) {
-      alert("Terjadi kesalahan");
+      toast.error("Terjadi kesalahan");
     }
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-8 select-none">
+    <div className="min-h-screen bg-slate-100 flex flex-col items-center justify-center p-8 select-none relative">
+      <div className="absolute top-8 right-8 flex gap-4">
+        <a href="/" className="bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-full shadow-sm border border-slate-200 font-medium transition-all active:scale-95 text-lg">
+          🏠 Kembali ke Home
+        </a>
+      </div>
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl p-10 text-center">
         {step === 1 && (
           <>

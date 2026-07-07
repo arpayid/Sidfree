@@ -134,6 +134,7 @@ export class PublicController {
   async simulatePayment(@Param('id') id: string) {
     const payment = await this.prisma.payment.findUnique({ where: { id }, include: { resident: true } });
     if (!payment) throw new HttpException("Tagihan tidak ditemukan", HttpStatus.NOT_FOUND);
+    if (payment.status === 'Success') throw new HttpException("Tagihan sudah dibayar", HttpStatus.BAD_REQUEST);
     
     const updated = await this.prisma.payment.update({
       where: { id },

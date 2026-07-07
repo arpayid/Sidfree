@@ -23,68 +23,68 @@ model Tenant {
 }
 
 model Role {
-  id          String   @id @default(uuid())
-  name        String   // Super Admin, Admin Desa, Warga
+  id          String @id @default(uuid())
+  name        String // Super Admin, Admin Desa, Warga
   permissions String // e.g., ["read:resident", "write:resident"]
-  
-  users       User[]
+
+  users User[]
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  
-  tenantId  String?
-  tenant    Tenant?  @relation(fields: [tenantId], references: [id])
-  
-  roleId    String
-  role      Role     @relation(fields: [roleId], references: [id])
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+  name     String
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   auditLogs AuditLog[]
 }
 
 model Family {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
-  kkNumber  String // Kartu Keluarga Number
-  address   String
-  rt        String?
-  rw        String?
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  kkNumber String // Kartu Keluarga Number
+  address  String
+  rt       String?
+  rw       String?
+
   residents Resident[]
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Resident {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
-  nik       String   // NIK
-  name      String
-  birthDate DateTime?
-  birthPlace String?
-  gender    String?
-  religion  String?
-  phone     String?  // WhatsApp number
-  
-  familyId  String?
-  family    Family?  @relation(fields: [familyId], references: [id])
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
 
-  status    String   @default("Aktif") // Aktif, Pindah, Meninggal
-  
+  nik        String // NIK
+  name       String
+  birthDate  DateTime?
+  birthPlace String?
+  gender     String?
+  religion   String?
+  phone      String? // WhatsApp number
+
+  familyId String?
+  family   Family? @relation(fields: [familyId], references: [id])
+
+  status String @default("Aktif") // Aktif, Pindah, Meninggal
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   complaints Complaint[]
   letters    Letter[]
   payments   Payment[]
@@ -92,90 +92,89 @@ model Resident {
 }
 
 model Complaint {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
-  title     String
-  content   String
-  status    String   @default("Pending") // Pending, Processed, Resolved
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  title   String
+  content String
+  status  String @default("Pending") // Pending, Processed, Resolved
+
   residentId String?
   resident   Resident? @relation(fields: [residentId], references: [id])
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Letter {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
-  type      String   // SKTM, Domisili, Pengantar
-  status    String   @default("Pending") // Pending, Approved, Rejected, Printed
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  type   String // SKTM, Domisili, Pengantar
+  status String @default("Pending") // Pending, Approved, Rejected, Printed
+
   residentId String
   resident   Resident @relation(fields: [residentId], references: [id])
-  
-  metadata  Json?    // Specific data for the letter type
 
-  signature String?  // Digital signature
-  qrCode    String?  // QR code tracking ID
-  
+  metadata Json? // Specific data for the letter type
+
+  signature String? // Digital signature
+  qrCode    String? // QR code tracking ID
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model AuditLog {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  
-  action    String
-  resource  String
-  details   Json?
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  action   String
+  resource String
+  details  Json?
+
   createdAt DateTime @default(now())
 }
 
-
 model Payment {
-  id        String   @id @default(uuid())
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id])
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
   residentId String
   resident   Resident @relation(fields: [residentId], references: [id])
-  
+
   amount    Float
-  type      String   // Iuran Sampah, Air, Keamanan
-  status    String   @default("Pending") // Pending, Success, Failed
-  reference String?  // Payment gateway reference
-  
+  type      String // Iuran Sampah, Air, Keamanan
+  status    String  @default("Pending") // Pending, Success, Failed
+  reference String? // Payment gateway reference
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Business {
-  id          String   @id @default(uuid())
-  tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-  
-  residentId  String
-  resident    Resident @relation(fields: [residentId], references: [id])
-  
+  id       String @id @default(uuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  residentId String
+  resident   Resident @relation(fields: [residentId], references: [id])
+
   name        String
   description String?
-  category    String   // Makanan, Kerajinan, Jasa
+  category    String // Makanan, Kerajinan, Jasa
   contact     String?
   imageUrl    String?
-  
-  status      String   @default("Active") // Active, Inactive
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  status String @default("Active") // Active, Inactive
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
