@@ -171,54 +171,57 @@ export default function SuratPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="relative w-full max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari pengajuan surat..."
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <FileOutput className="w-4 h-4 mr-2" />
-            Rekap Data
-          </button>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Layanan Surat</h1>
+          <p className="text-slate-500 mt-1 leading-relaxed">Kelola permohonan surat dari warga desa.</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Cari pemohon surat..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-full bg-slate-50 hover:bg-slate-100 transition-colors"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button onClick={exportToCSV} className="flex items-center px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm transition-all">
+              <FileOutput className="w-4 h-4 mr-2" />
+              Rekap Data
+            </button>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200"
                 >
                   Tipe Surat
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200"
                 >
                   Pemohon
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200"
                 >
                   Tanggal
                 </th>
                 <th
                   scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200"
                 >
                   Status
                 </th>
@@ -255,7 +258,7 @@ export default function SuratPage() {
                 </tr>
               ) : (
                 filteredLetters.map((letter: any) => (
-                  <tr key={letter.id} className="hover:bg-slate-50">
+                  <tr key={letter.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                       {letter.type}
                     </td>
@@ -267,7 +270,7 @@ export default function SuratPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
                         ${letter.status === "Pending" ? "bg-amber-100 text-amber-800" : ""}
                         ${letter.status === "Approved" ? "bg-green-100 text-green-800" : ""}
                         ${letter.status === "Rejected" ? "bg-red-100 text-red-800" : ""}

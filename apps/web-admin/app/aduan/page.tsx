@@ -63,30 +63,34 @@ export default function AduanPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="relative w-full max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari aduan warga..."
-          />
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Aduan Masyarakat</h1>
+          <p className="text-slate-500 mt-1 leading-relaxed">Kelola laporan dan aduan dari warga desa.</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Cari Aduan..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-full bg-slate-50 hover:bg-slate-100 transition-colors"
+            />
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Subjek Aduan</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Pelapor</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tanggal</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200">Subjek Aduan</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200">Pelapor</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200">Tanggal</th>
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest bg-slate-50 border-b border-slate-200">Status</th>
                 <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
               </tr>
             </thead>
@@ -106,7 +110,7 @@ export default function AduanPage() {
                 </tr>
               ) : (
                 filteredComplaints.map((complaint: any) => (
-                  <tr key={complaint.id} className="hover:bg-slate-50">
+                  <tr key={complaint.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-slate-900">{complaint.title}</div>
                       <div className="text-sm text-slate-500 truncate max-w-xs">{complaint.content}</div>
@@ -116,7 +120,7 @@ export default function AduanPage() {
                       {new Date(complaint.createdAt).toLocaleDateString('id-ID')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
                         ${complaint.status === 'Pending' ? 'bg-amber-100 text-amber-800' : ''}
                         ${complaint.status === 'Processed' ? 'bg-blue-100 text-blue-800' : ''}
                         ${complaint.status === 'Resolved' ? 'bg-green-100 text-green-800' : ''}
@@ -193,7 +197,7 @@ export default function AduanPage() {
               </div>
               <div>
                 <div className="text-sm font-medium text-slate-500 mb-1">Status</div>
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${
                   activeItem.status === 'Resolved' ? 'bg-green-100 text-green-800' : 
                   activeItem.status === 'Processed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
                 }`}>

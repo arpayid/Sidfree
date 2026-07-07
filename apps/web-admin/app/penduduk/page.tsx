@@ -171,98 +171,83 @@ export default function ResidentsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="relative w-full max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-slate-400" />
-          </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            placeholder="Cari penduduk (NIK atau Nama)..."
-          />
-        </div>
-
-        <div className="flex gap-2">
-          <button onClick={exportToCSV} className="flex items-center px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50">
-            <FileOutput className="w-4 h-4 mr-2" />
-            Ekspor
-          </button>
-          <button
-            onClick={() => handleOpenForm()}
-            className="flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Data
-          </button>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Data Penduduk</h1>
+          <p className="text-slate-500">Kelola master data kependudukan desa.</p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-200 bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Cari NIK atau Nama..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none w-full bg-slate-50 hover:bg-slate-100 transition-colors"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={exportToCSV}
+              className="flex items-center px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 shadow-sm transition-all"
+            >
+              <FileOutput className="w-4 h-4 mr-2" />
+              Ekspor
+            </button>
+            <button
+              onClick={() => handleOpenForm()}
+              className="flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold hover:bg-blue-700 shadow-sm transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Tambah Penduduk
+            </button>
+          </div>
+        </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">
                   NIK
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  Nama
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  Nama Lengkap
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
-                  No. KK
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">
+                  Nomor KK
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-widest">
                   Status
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"
-                >
+                <th scope="col" className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-widest">
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
+            <tbody className="bg-white divide-y divide-slate-100">
               {isLoading ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-sm text-slate-500"
-                  >
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">
                     Memuat data...
                   </td>
                 </tr>
               ) : filteredResidents.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-4 text-center text-sm text-slate-500"
-                  >
+                  <td colSpan={5} className="px-6 py-8 text-center text-sm text-slate-500">
                     Data tidak ditemukan.
                   </td>
                 </tr>
               ) : (
                 filteredResidents.map((resident: any) => (
-                  <tr key={resident.id} className="hover:bg-slate-50">
+                  <tr key={resident.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                       {resident.nik}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-700">
                       {resident.name}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
@@ -270,7 +255,7 @@ export default function ResidentsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${resident.status === "Aktif" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}
+                        className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full ${resident.status === "Aktif" ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
                       >
                         {resident.status}
                       </span>
@@ -278,14 +263,14 @@ export default function ResidentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleOpenForm(resident)}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
+                        className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 mr-2 transition-colors"
                         title="Edit"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleOpenDelete(resident)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-rose-600 hover:text-rose-800 p-2 rounded-lg hover:bg-rose-50 transition-colors"
                         title="Hapus"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -298,8 +283,9 @@ export default function ResidentsPage() {
           </table>
         </div>
       </div>
-
+      
       {/* Form Modal */}
+          {/* Form Modal */}
       {isFormModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-lg">
